@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post">
+        <div class="mb-3">
+            <label for="InputReview" class="form-label">Оценка</label>
+            <select class="form-control" id="InputReview" name="review" required>
+                <option value="5">5 – отлично</option>
+                <option value="4">4 – хорошо</option>
+                <option value="3">3 – удовлетворительно</option>
+                <option value="2">2 – неудовлетворительно</option>
+                <option value="1">1 – плохо</option>
+                <option value="0">0 – ужасно</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="review_text">Текст рецензии</label>
+            <textarea class="form-control" id="review_text" name="text" rows="5" autofocus="autofocus" required>Запиши сюда что-то</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить рецензию</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.css">
+
+<script>
+    var easyMDE = new EasyMDE({ element: document.getElementById('review_text') });
+</script>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% macro form(book, current_user, genres) %}
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="container mb-3">
+        <div class="mb-3">
+            <label for="InputName" class="form-label">Название книги</label>
+            <input type="text" name="name" class="form-control" id="InputName" value="{{ book.title or '' }}" required>
+        </div>
+        <label class="mb-1" for="genres">Жанры</label>
+        <div class="mb-3">
+            <select name="genres" id="genres" multiple class="form-control">
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if genre in book.genres %} selected {% endif %}>{{ genre.name }}</option>
+                {% endfor %}
+            </select>    
+        </div>
+        <div class="form-group">
+            <label for="book_short_desc">Описание книги</label>
+            <textarea class="form-control" id="book_short_desc" name="short_desc">{{ book.description }}</textarea>
+        </div>      
+        <div class="mb-3">
+            <label for="InputYear" class="form-label">Год</label>
+            <input type="number" name="year" class="form-control" id="InputYear" value="{{ book.year or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputPublisher" class="form-label">Издательство</label>
+            <input type="text" name="publisher" class="form-control" id="InputPublisher" value="{{ book.publisher or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputAuthor" class="form-label">Автор</label>
+            <input type="text" name="author" class="form-control" id="InputAuthor" value="{{ book.author or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputPages" class="form-label">Объем страницы</label>
+            <input type="number" name="pages" class="form-control" id="InputPages" value="{{ book.pages or '' }}" required>
+        </div>
+        {% if request.endpoint == "book.create_book" %}
+        <div class="col-md-6 d-flex flex-column">
+            <div class="mb-3">
+                <label for="book_cover">Обложка книги</label>
+                <input class="form-control" type="file" name="book_cover" id="book_cover">
+            </div>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </div>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2/dist/easymde.min.css">
+
+<script>
+    var easyMDE = new EasyMDE({ element: document.getElementById('book_short_desc') });
+</script>
+
+{% endmacro %}

@@ -1,0 +1,11 @@
+# Игнорировать все __pycache__ в проекте
+__pycache__/
+*/__pycache__/
+
+# Игнорировать configure.py
+configure.py
+
+# Игнорировать все файлы в папке media
+media/
+*/media/
+

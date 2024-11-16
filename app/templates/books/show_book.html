@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='show_book.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            {% if book.cover %}
+            <img class="img-fluid fixed-size" src="{{ book.cover }}" alt="{{ book.title }} cover">
+            {% else %}
+            <p>Обложка отсутствует</p>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h1>{{ book.title }}</h1>
+            <div class="description">
+                {{ book.description | safe }}  <!-- Используйте фильтр safe для отображения HTML -->
+            </div>
+            <p><strong>Автор:</strong> {{ book.author }}</p>
+            <p><strong>Год издания:</strong> {{ book.year }}</p>
+            <p><strong>Жанры:</strong> {{ book.genres | join(', ') }}</p>
+            <p><strong>Издательсвто:</strong> {{ book.publisher }}</p>
+            <p><strong>Кол-во страниц:</strong> {{ book.pages }}</p>
+            <hr>
+            {% if current_user.is_authenticated %}
+                {% if user_review %}
+                    <div class="review">
+                        <h4>Ваша рецензия</h4>
+                        <p><strong>Оценка:</strong> {{ user_review.rating }}</p>
+                        <div>{{ user_review.text | safe }}</div>
+                    </div>
+                {% else %}
+                    <a class="btn btn-primary" href="{{ url_for('review.make_review', book_id=book.id) }}">Написать рецензию</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-12">
+            <h3 class="my-3">Рецензии пользователей:</h3>
+            <div class="list-group">
+                {% for comment in reviews %}
+                <div class="list-group-item mb-3">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <div class="me-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ comment.user.full_name }}</h5>
+                            <p class="text-muted mb-1">Оценка: {{ comment.rating }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <p class="mb-1">{{ comment.text | safe }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

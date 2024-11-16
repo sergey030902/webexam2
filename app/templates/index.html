@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Таблица с книгами</h1>
+    <table class="table">
+        <thead>
+            <tr class="text-center">
+                <th>Название</th>
+                <th>Жанры</th>
+                <th>Год</th>
+                <th>Средняя оценка пользователей</th>
+                <th>Количество рецензий</th>
+                {% if current_user.is_authenticated  %}
+                    <th>Действия</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+        <tr>
+            <td class="text-center book_title">{{ book.title }}</td>
+            <td class="text-center">{{ book.genres | join(', ') }}</td>
+            <td class="text-center">{{ book.year }}</td>
+            <td class="text-center">{{ book.average_rating or 'Нет оценок' }}</td>
+            <td class="text-center">{{ book.reviews_count }}</td>
+            <td class="text-center">
+                <div class="d-flex justify-content-center gap-2">
+                    {% if current_user.is_authenticated  %}
+                        {% if current_user.can('edit_book') %}
+                        <a class="btn btn-primary" href="{{ url_for('book.edit_book', book_id=book.id) }}">Изменить</a>
+                        {% endif %}
+                        <a class="btn btn-success" href="{{ url_for('book.show_book', book_id=book.id) }}">Просмотреть</a>
+                        {% if current_user.can('delete_book') %}
+                        <a href="#" class="btn btn-danger" data-action="{{ url_for('book.delete_book', book_id=book.id) }}" data-bs-toggle="modal" data-bs-target="#deleteBook">Удалить</a>
+                        {% endif %}
+                        {% if current_user.can('add_collection') %}
+                        <a href="#" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addToCollectionModal" data-book-id="{{ book.id }}">Добавить в подборку</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if current_user.is_authenticated  %}
+        {% if current_user.can('create_book') %}
+        <a class="btn btn-primary text-center" href="{{ url_for('book.create_book') }}">Добавить книгу</a>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="container text-center mb-3">
+    {% if books_pog.has_prev %}
+        <a href="{{ url_for('index', page=books_pog.prev_num) }}" class="btn btn-primary">Предыдущая</a>
+    {% endif %}
+    {% if books_pog.has_next %}
+        <a href="{{ url_for('index', page=books_pog.next_num) }}" class="btn btn-primary">Следующая</a>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="addToCollectionModal" tabindex="-1" aria-labelledby="addToCollectionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addToCollectionLabel">Добавить в подборку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addToCollectionForm" action="{{ url_for('collection.add_to_collection') }}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="book_id" id="bookIdInput">
+                    <div class="mb-3">
+                        <label for="collectionSelect" class="form-label">Выберите подборку</label>
+                        <select class="form-select" id="collectionSelect" name="collection_id" required>
+                            {% for collection in user_collections %}
+                            <option value="{{ collection.id }}">{{ collection.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteBook" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Удаление записи</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы действительно хотите удалить книгу <span class="book-title"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <form class="modal-form" method="post">
+                    <button type="submit" class="btn btn-primary">Да</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{url_for('static', filename='deleteBook.js')}}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCollectionModal = document.getElementById('addToCollectionModal');
+    addToCollectionModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const bookId = button.getAttribute('data-book-id');
+        const bookIdInput = addToCollectionModal.querySelector('#bookIdInput');
+        bookIdInput.value = bookId;
+    });
+});
+</script>
+{% endblock %}

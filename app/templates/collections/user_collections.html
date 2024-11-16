@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Ваши подборки</h1>
+    <table class="table">
+        <thead>
+            <tr class="text-center">
+                <th>Название</th>
+                <th>Кол-во книг в подборке</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for collection in collections %}
+        <tr>
+            <td class="text-center book_title">{{ collection.name }}</td>
+            <td class="text-center">{{ collection.books|length }}</td>
+            <td class="text-center">
+                <a class="btn btn-primary" href="{{ url_for('collection.current_collection', collection_id=collection.id) }}">Просмотреть</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCollectionModal">Добавить подборку</button>
+</div>
+
+<div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCollectionLabel">Новая подборка</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('collection.add_collection') }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="collectionName" class="form-label">Название подборки</label>
+                        <input type="text" class="form-control" id="collectionName" name="name" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

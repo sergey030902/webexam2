@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Подборка: {{ collection.name }}</h1>
+    <table class="table">
+        <thead>
+            <tr class="text-center">
+                <th>Название</th>
+                <th>Автор</th>
+                <th>Год</th>
+                <th>Жанры</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+        <tr>
+            <td class="text-center">{{ book.title }}</td>
+            <td class="text-center">{{ book.author }}</td>
+            <td class="text-center">{{ book.year }}</td>
+            <td class="text-center">{{ book.genres | map(attribute='name') | join(', ') }}</td>
+            <td class="text-center">
+                <a class="btn btn-success" href="{{ url_for('book.show_book', book_id=book.id) }}">Просмотреть</a>
+                {% if current_user.can('edit_book') %}
+                <a class="btn btn-primary" href="{{ url_for('book.edit_book', book_id=book.id) }}">Изменить</a>
+                {% endif %}
+                {% if current_user.can('delete_book') %}
+                <a href="#" class="btn btn-danger" data-action="{{ url_for('book.delete_book', book_id=book.id) }}" data-bs-toggle="modal" data-bs-target="#deleteBook">Удалить</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="deleteBook" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Удаление книги</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы действительно хотите удалить книгу <span class="book-title"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <form class="modal-form" method="post">
+                    <button type="submit" class="btn btn-primary">Да</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBookModal = document.getElementById('deleteBook');
+    deleteBookModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const action = button.getAttribute('data-action');
+        const form = deleteBookModal.querySelector('.modal-form');
+        form.action = action;
+        const bookTitle = button.closest('tr').querySelector('.book_title').textContent;
+        deleteBookModal.querySelector('.book-title').textContent = bookTitle;
+    });
+});
+</script>
+{% endblock %}
