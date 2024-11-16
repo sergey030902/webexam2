@@ -7,5 +7,5 @@ configure.py
 
 # Игнорировать все файлы в папке media
 media/
-*/media/
+#*/media/
 
